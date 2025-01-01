@@ -1,101 +1,163 @@
-import Image from "next/image";
+'use client';
+import { useEffect, useState, useRef } from 'react'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { Send } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [showSplash, setShowSplash] = useState(true)
+  const [message, setMessage] = useState('')
+  const [messages, setMessages] = useState([])
+  const scrollRef = useRef(null)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+
+    const timer = setTimeout(() => {
+      setShowSplash(false)
+    }, 3500)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Scroll to bottom when messages update
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!message.trim()) return
+
+    // Add user message
+    const userMessage = {
+      id: Date.now().toString(),
+      content: message,
+      role: 'user',
+      timestamp: new Date(),
+    }
+
+    // Add bot response (example)
+    const botMessage = {
+      id: (Date.now() + 1).toString(),
+      content: "I'll help you assess that. Can you provide more details?",
+      role: 'bot',
+      timestamp: new Date(),
+    }
+
+    setMessages((prev) => [...prev, userMessage, botMessage])
+    setMessage('')
+  }
+
+  if (showSplash) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center">
+        <div
+          data-aos="fade-down"
+          className="relative mb-8 h-48 w-48"
+        >
+          <img
+            src="/mascot.gif"
+            alt="CareSense Mascot"
+            className="h-full w-full object-contain"
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <h1
+          data-aos="fade-up"
+          className="bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 bg-clip-text text-center text-4xl font-bold text-transparent"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          Assess your health risks in minutes using CareSense
+        </h1>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      {/* Chat Container */}
+      <div className="flex-1 p-4">
+        <div className="mx-auto max-w-4xl h-[calc(100vh-180px)]">
+          <ScrollArea className="h-full pr-4">
+            <div
+              className="flex flex-col items-center justify-center h-full space-y-6 py-6"
+              data-aos="fade-up"
+            >
+              <div className="relative h-48 w-48">
+                <img
+                  src="/mascot-hi.gif"
+                  alt="Carey the Health Assistant"
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <h2 className="text-2xl font-semibold text-center text-transparent bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 bg-clip-text">
+                Hi, I&apos;m Carey! Your personal health assessor. How can I help you today?
+              </h2>
+            </div>
+            <div className="space-y-4">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex items-start gap-3 ${
+                    msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                  }`}
+                >
+                  <Avatar className="h-8 w-8">
+                    {msg.role === 'bot' ? (
+                      <AvatarImage src="/mascot-avatar.gif" alt="Carey" />
+                    ) : (
+                      <AvatarImage alt="User" />
+                    )}
+                    <AvatarFallback>
+                      {msg.role === 'bot' ? 'C' : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div
+                    className={`rounded-lg px-4 py-2 max-w-[80%] border border-white/25 ${
+                      msg.role === 'user'
+                        ? 'bg-white text-black'
+                        : 'bg-transparent text-white'
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+              {/* Scroll Ref at the bottom */}
+              <div ref={scrollRef}></div>
+            </div>
+          </ScrollArea>
+        </div>
+      </div>
+
+      {/* Input Area */}
+      <div className="p-4">
+        <form onSubmit={handleSubmit} className="mx-auto max-w-4xl flex gap-2">
+          <Textarea
+            placeholder="Type your health concerns here..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
+            className="min-h-[60px] flex-1"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <Button
+            type="submit"
+            size="icon"
+            className="h-[60px] w-[60px] bg-blue-500 hover:bg-blue-600"
+          >
+            <Send className="h-5 w-5" />
+            <span className="sr-only">Send message</span>
+          </Button>
+        </form>
+      </div>
     </div>
-  );
+  )
 }
