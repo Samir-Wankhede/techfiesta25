@@ -3,7 +3,7 @@ import { ArrowRightIcon } from "lucide-react"
 
 export function NavBar() {
   return (
-    <header className="flex py-12 md:py-6 shadow-xl  md:top-0 w-[130vh] md:w-full md:z-100 ">
+    <header className="flex py-6 top-0 w-full z-10 absolute">
       <nav className="flex justify-end md:items-center gap-4  md:container font-semibold mx-5">
 
       <SignedIn>
